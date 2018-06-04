@@ -1,10 +1,11 @@
 FROM quay.io/pypa/manylinux1_x86_64:latest
 
+ARG or-tools_branch=master
 ENV SRC_ROOT /root/src
 ENV BUILD_ROOT /root/build
 ENV EXPORT_ROOT /export
 ENV SRC_GIT_URL https://github.com/google/or-tools
-ENV SRC_GIT_BRANCH master
+ENV SRC_GIT_BRANCH=$or-tools_branch
 # The build of Python 2.6.x bindings is known to be broken.
 ENV SKIP_PLATFORMS "cp26-cp26m cp26-cp26mu"
 
