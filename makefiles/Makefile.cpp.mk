@@ -276,6 +276,18 @@ strawberry_fields_with_column_generation \
 tsp \
 weighted_tardiness_sat
 
+CC_TESTS = \
+ac4r_table_test \
+boolean_test \
+bug_fz1 \
+cpp11_test \
+forbidden_intervals_test \
+gcc_test \
+issue173 \
+issue57 \
+min_max_test \
+visitor_test
+
 .PHONY: ccexe
 ccexe: $(addsuffix $E, $(addprefix $(BIN_DIR)/, $(CC_EXAMPLES)))
 
@@ -285,7 +297,7 @@ $(CVRPTW_OBJS): \
  $(EX_DIR)/cpp/cvrptw_lib.cc \
  $(EX_DIR)/cpp/cvrptw_lib.h \
  $(CP_DEPS) \
- $(SRC_DIR)/ortools/constraint_solver/routing.h | $(OBJ_DIR)
+ | $(OBJ_DIR)
 	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/cvrptw_lib.cc $(OBJ_OUT)$(OBJ_DIR)$Scvrptw_lib.$O
 
 $(CVRPTW_LIBS): $(OR_TOOLS_LIBS) $(CVRPTW_OBJS) | $(LIB_DIR)
@@ -419,45 +431,17 @@ $(BIN_DIR)/fz$E: $(OBJ_DIR)/flatzinc/fz.$O $(FLATZINC_LIBS) $(OR_TOOLS_LIBS) | $
 $(BIN_DIR)/parser_main$E: $(OBJ_DIR)/flatzinc/parser_main.$O $(FLATZINC_LIBS) $(OR_TOOLS_LIBS) | $(BIN_DIR)
 	$(CCC) $(CFLAGS) $(OBJ_DIR)$Sflatzinc$Sparser_main.$O $(FLATZINC_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Sparser_main$E
 
-# Flow and linear assignment cpp
+# Generic CPP rules
+$(OBJ_DIR)/%.$O: $(EX_DIR)/cpp/%.cc | $(OBJ_DIR)
+	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp$S$*.cc $(OBJ_OUT)$(OBJ_DIR)$S$*.$O
 
-$(OBJ_DIR)/linear_assignment_api.$O: $(EX_DIR)/cpp/linear_assignment_api.cc | $(OBJ_DIR)
-	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/linear_assignment_api.cc $(OBJ_OUT)$(OBJ_DIR)$Slinear_assignment_api.$O
+$(BIN_DIR)/%$E: $(OR_TOOLS_LIBS) $(OBJ_DIR)/%.$O | $(BIN_DIR)
+	$(CCC) $(CFLAGS) $(OBJ_DIR)$S$*.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$S$*$E
 
-$(BIN_DIR)/linear_assignment_api$E: $(OR_TOOLS_LIBS) $(OBJ_DIR)/linear_assignment_api.$O | $(BIN_DIR)
-	$(CCC) $(CFLAGS) $(OBJ_DIR)/linear_assignment_api.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Slinear_assignment_api$E
-
-$(OBJ_DIR)/flow_api.$O: $(OR_TOOLS_LIBS) $(EX_DIR)/cpp/flow_api.cc | $(OBJ_DIR)
-	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/flow_api.cc $(OBJ_OUT)$(OBJ_DIR)$Sflow_api.$O
-
-$(BIN_DIR)/flow_api$E: $(OBJ_DIR)/flow_api.$O | $(BIN_DIR)
-	$(CCC) $(CFLAGS) $(OBJ_DIR)/flow_api.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Sflow_api$E
-
-$(OBJ_DIR)/dimacs_assignment.$O: $(EX_DIR)/cpp/dimacs_assignment.cc | $(OBJ_DIR)
-	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/dimacs_assignment.cc $(OBJ_OUT)$(OBJ_DIR)$Sdimacs_assignment.$O
-
+# Custom Rules
 $(BIN_DIR)/dimacs_assignment$E: $(DIMACS_LIBS) $(OR_TOOLS_LIBS) $(OBJ_DIR)/dimacs_assignment.$O | $(BIN_DIR)
-	$(CCC) $(CFLAGS) $(OBJ_DIR)/dimacs_assignment.$O $(DIMACS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Sdimacs_assignment$E
+	$(CCC) $(CFLAGS) $(OBJ_DIR)$Sdimacs_assignment.$O $(DIMACS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Sdimacs_assignment$E
 
-# Pure CP and Routing Examples
-
-$(OBJ_DIR)/acp_challenge.$O: $(EX_DIR)/cpp/acp_challenge.cc $(SRC_DIR)/ortools/constraint_solver/constraint_solver.h | $(OBJ_DIR)
-	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/acp_challenge.cc $(OBJ_OUT)$(OBJ_DIR)$Sacp_challenge.$O
-
-$(BIN_DIR)/acp_challenge$E: $(OR_TOOLS_LIBS) $(OBJ_DIR)/acp_challenge.$O | $(BIN_DIR)
-	$(CCC) $(CFLAGS) $(OBJ_DIR)/acp_challenge.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Sacp_challenge$E
-
-$(OBJ_DIR)/acp_challenge_routing.$O: $(EX_DIR)/cpp/acp_challenge_routing.cc $(SRC_DIR)/ortools/constraint_solver/constraint_solver.h | $(OBJ_DIR)
-	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/acp_challenge_routing.cc $(OBJ_OUT)$(OBJ_DIR)$Sacp_challenge_routing.$O
-
-$(BIN_DIR)/acp_challenge_routing$E: $(OR_TOOLS_LIBS) $(OBJ_DIR)/acp_challenge_routing.$O | $(BIN_DIR)
-	$(CCC) $(CFLAGS) $(OBJ_DIR)/acp_challenge_routing.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Sacp_challenge_routing$E
-
-$(OBJ_DIR)/costas_array.$O: $(EX_DIR)/cpp/costas_array.cc $(SRC_DIR)/ortools/constraint_solver/constraint_solver.h | $(OBJ_DIR)
-	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/costas_array.cc $(OBJ_OUT)$(OBJ_DIR)$Scostas_array.$O
-
-$(BIN_DIR)/costas_array$E: $(OR_TOOLS_LIBS) $(OBJ_DIR)/costas_array.$O | $(BIN_DIR)
-	$(CCC) $(CFLAGS) $(OBJ_DIR)/costas_array.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Scostas_array$E
 
 $(OBJ_DIR)/code_samples_sat.$O: $(EX_DIR)/cpp/code_samples_sat.cc $(SAT_DEPS) | $(OBJ_DIR)
 	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp/code_samples_sat.cc $(OBJ_OUT)$(OBJ_DIR)$Scode_samples_sat.$O
@@ -751,8 +735,7 @@ $(BIN_DIR)/solve$E: $(OBJ_DIR)/glop/solve.$O $(OR_TOOLS_LIBS) | $(BIN_DIR)
 	$(CCC) $(CFLAGS) $(OBJ_DIR)$Sglop$Ssolve.$O $(OR_TOOLS_LNK) $(OR_TOOLS_LDFLAGS) $(EXE_OUT)$(BIN_DIR)$Ssolve$E
 
 # Sat solver
-
-sat: bin/sat_runner$E
+sat: $(BIN_DIR)/sat_runner$E
 
 $(OBJ_DIR)/sat/sat_runner.$O: $(EX_DIR)/cpp/sat_runner.cc $(EX_DIR)/cpp/opb_reader.h $(EX_DIR)/cpp/sat_cnf_reader.h $(SAT_DEPS) | $(OBJ_DIR)/sat
 	$(CCC) $(CFLAGS) -c $(EX_DIR)$Scpp$Ssat_runner.cc $(OBJ_OUT)$(OBJ_DIR)$Ssat$Ssat_runner.$O
